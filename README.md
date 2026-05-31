@@ -1,93 +1,357 @@
-# diyar legal question generation
+# Intelligent Legal Data Generation Pipeline
 
+An end-to-end AI pipeline for transforming raw statutory text into structured, multi-level legal question-answer datasets for chatbot, LLM, and RAG evaluation.
 
+## Overview
 
-## Getting started
+This project automates the generation, processing, and standardization of legal evaluation data from unstructured law documents. It combines **Python orchestration**, **n8n workflow automation**, and **Gemini LLM-based prompt execution** to produce structured outputs in **TXT, XLSX, and JSON** formats.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+The system was designed to address a common challenge in legal AI: the lack of scalable, high-quality evaluation datasets for testing the factual accuracy, reasoning ability, and reliability of language models in legal contexts.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Problem Statement
 
-## Add your files
+Legal text is difficult for general-purpose LLMs because it is:
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+- highly specialized in terminology
+- structurally complex
+- sensitive to wording and legal nuance
+- prone to hallucination when interpreted without grounding
 
-```
-cd existing_repo
-git remote add origin https://git.sokhandev.ir/isti/diyar-legal-question-generation.git
-git branch -M main
-git push -uf origin main
-```
+Manual creation of legal QA datasets is expensive, slow, and difficult to scale. This project was built to industrialize that process through an automated and modular pipeline.
 
-## Integrate with your tools
+## Objectives
 
-- [ ] [Set up project integrations](https://git.sokhandev.ir/isti/diyar-legal-question-generation/-/settings/integrations)
+- Convert raw legal text into structured evaluation datasets
+- Generate legal QA pairs across multiple reasoning levels
+- Standardize outputs for both human review and downstream system use
+- Improve reproducibility, scalability, and maintainability of legal data generation
+- Enable future use in chatbot benchmarking, RAG evaluation, and legal AI testing workflows
 
-## Collaborate with your team
+## Key Features
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+- **End-to-end automation** from raw law documents to final JSON outputs
+- **Multi-level question generation** across 4 complexity levels
+- **Prompt engineering framework** for different legal reasoning tasks
+- **Modular architecture** separating business logic from execution logic
+- **Automated format conversion** from TXT to XLSX to JSON
+- **Aggregation layer** for unified Excel-based human review
+- **Multi-stage quality control**
+- **Logging and execution monitoring**
+- **Token usage optimization** for cost-sensitive LLM workflows
 
-## Test and Deploy
+## System Architecture
 
-Use the built-in continuous integration in GitLab.
+The architecture is built around two core components:
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### 1. Logic Layer: n8n Workflow
+The n8n workflow serves as the system’s orchestration and prompt-engineering layer. It is responsible for:
 
-***
+- receiving requests via webhook
+- selecting the correct prompt based on question level
+- injecting legal terminology when needed
+- routing requests to the LLM
+- post-processing model outputs into structured responses
 
-# Editing this README
+### 2. Execution Layer: Python Pipeline
+The Python modules serve as the execution arm of the system. They are responsible for:
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+- reading legal text files
+- sending requests to n8n
+- saving raw outputs
+- converting text tables to Excel
+- aggregating structured files
+- converting outputs into final JSON datasets
+- validating and logging execution steps
 
-## Suggestions for a good README
+## Design Philosophy
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+A major architectural decision in this project was the separation of:
 
-## Name
-Choose a self-explaining name for your project.
+- **business logic / prompt logic** → managed in n8n
+- **execution / file processing / ETL tasks** → managed in Python
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+This separation improves:
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+- maintainability
+- modularity
+- scalability
+- flexibility for replacing the underlying LLM
+- ease of prompt iteration without redeploying Python code
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## End-to-End Data Flow
+```text
+Raw Law Files
+   ↓
+main_pipeline.py
+   ↓
+n8n Webhook
+   ↓
+Gemini LLM
+   ↓
+Generated QA Table (TXT)
+   ↓
+Excel Conversion (XLSX)
+   ↓
+Aggregated Excel Output
+   ↓
+Structured JSON Files
+
+## Reasoning Levels
+
+The system generates legal QA data across four complexity levels:
+
+### Level 1 — Direct Extraction
+Focuses on explicit facts and direct retrieval from legal text.
+
+Examples:
+- identifying responsible entities
+- extracting deadlines or quantities
+- recognizing direct prohibitions or definitions
+
+### Level 2 — Rewriting and Explanation
+Focuses on paraphrasing, summarization, and plain-language explanation of legal content.
+
+### Level 3 — Conditional and Procedural Reasoning
+Focuses on:
+- if/then logic
+- step-by-step legal procedures
+- distinguishing general rules from exceptions
+
+### Level 4 — Cross-Article Synthesis
+Focuses on combining information from multiple legal provisions to produce a single answer.
+
+## Prompt Engineering Strategy
+
+The prompt layer is one of the core assets of this project. Prompt templates were designed separately for each reasoning level to guide the LLM in producing legally grounded, structured outputs.
+
+The prompts differ in terms of:
+- extraction vs. synthesis requirements
+- citation behavior
+- quotation constraints
+- use of legal terminology
+- expected reasoning complexity
+
+## Legal Terminology Dictionary
+
+To improve the quality of outputs in higher-complexity levels, the system uses a legal terminology dictionary containing specialized legal terms and their simplified meanings.
+
+This terminology is selectively injected into prompts to improve:
+- legal precision
+- consistency of explanations
+- model understanding of domain-specific vocabulary
+
+## Token Optimization Strategy
+
+Because terminology injection increases token usage and cost, the system applies conditional logic:
+
+- **Level 1** runs without the terminology dictionary
+- **Levels 2–4** include the dictionary when deeper understanding is required
+
+This design helps balance:
+- cost efficiency
+- response quality
+- latency
+
+## Python Modules
+
+### `main_pipeline.py`
+The orchestrator of the entire workflow.
+
+Responsibilities:
+- configuration management
+- folder setup
+- dependency checks
+- sequential execution of all steps
+- logging and failure control
+
+### `legal_question_generator.py`
+Handles communication with the n8n webhook.
+
+Responsibilities:
+- reading law text files
+- sending POST requests to n8n
+- receiving model outputs
+- saving generated results
+
+### `table_text_to_excel_converter.py`
+Converts raw text table outputs into structured Excel files.
+
+Responsibilities:
+- parsing markdown-style tables
+- cleaning rows and columns
+- exporting standardized XLSX files
+
+### `aggregate_xlsx_tables.py`
+Aggregates multiple Excel files into a single reviewable dataset.
+
+Responsibilities:
+- standardizing column names
+- enriching data with source metadata
+- combining outputs across laws and levels
+
+### `xlsx_to_json_converter.py`
+Converts structured Excel files into JSON format for downstream use.
+
+Responsibilities:
+- filtering incomplete rows
+- validating final records
+- exporting machine-readable legal QA datasets
+
+## Output Formats
+
+The pipeline produces multiple output formats for different users and use cases:
+
+- **TXT**: raw generated tables
+- **XLSX**: structured files for human review
+- **Aggregated XLSX**: unified dataset for product/legal analysis
+- **JSON**: machine-readable format for backend systems, evaluation pipelines, or model testing
+
+### Example JSON Record
+
+json
+{
+  "question_id": "example_001",
+  "question_txt": "Who is responsible for ...?",
+  "correct_answer_txt": "According to Article ...",
+  "level": 1,
+  "pattern": "Actor Identification",
+  "law_reference": "Article 12",
+  "answer_reasoning": "The answer is directly stated in the law.",
+  "source_file": "law_01_level_1.json"
+}
+
+## Quality Control
+
+The project includes a multi-stage quality control layer across the pipeline:
+
+- validation of expected response structure from n8n
+- filtering malformed or incomplete text rows
+- column standardization before aggregation
+- removal of incomplete JSON records
+- final execution summary and log-based monitoring
+
+This QC design improves:
+- output consistency
+- traceability
+- reliability for downstream evaluation tasks
+
+## Logging and Monitoring
+
+A structured logging system was implemented to replace ad hoc print-based debugging.
+
+Logging covers:
+- dependency checks
+- folder preparation
+- execution progress
+- conversion summaries
+- warnings for incomplete rows
+- errors in network or file processing
+- final pipeline execution summary
+
+This makes the system easier to debug, maintain, and operate in batch workflows.
+
+## Project Structure
+
+text
+Legal_QG_Pipeline/
+├── laws/
+├── output/
+├── xlsx_output/
+├── json_output/
+├── pipeline.log
+├── aggregated_legal_questions.xlsx
+├── main_pipeline.py
+├── legal_question_generator.py
+├── table_text_to_excel_converter.py
+├── aggregate_xlsx_tables.py
+└── xlsx_to_json_converter.py
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Requirements
+- Python 3.6+
+- pandas
+- openpyxl
+- requests
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+Install dependencies with:
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+bash
+pip install pandas openpyxl requests
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+> Recommended future improvement: add a `requirements.txt` file for reproducible setup.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## How to Run
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+1. Place legal text files in the `laws/` folder  
+2. Configure the pipeline settings in `main_pipeline.py`  
+3. Run the pipeline:
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+bash
+python main_pipeline.py
 
-## License
-For open source projects, say how it is licensed.
+4. Review outputs in:
+- `output/`
+- `xlsx_output/`
+- `json_output/`
+- `aggregated_legal_questions.xlsx`
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Configuration
+
+Key configuration options include:
+
+- input/output folder paths
+- defined reasoning levels
+- execution mode (`manual` or `auto`)
+- stop-on-failure behavior
+
+## Execution Modes
+
+### Manual Mode
+The pipeline reads `.txt` law files from the local `laws/` folder and sends their contents to the n8n webhook.
+
+### Auto Mode
+The pipeline sends law identifiers to n8n and relies on preconfigured legal texts stored inside the workflow.
+
+## Use Cases
+
+This pipeline can support:
+
+- legal chatbot evaluation
+- legal RAG benchmarking
+- structured dataset generation for LLM testing
+- internal quality benchmarking for legal AI systems
+- domain-specific data preparation workflows
+
+## Development History
+
+The current architecture evolved through iterative problem-solving around:
+
+- request timeout issues
+- output format limitations
+- token cost management
+- aggregation needs for human reviewers
+- codebase cleanup and logging improvements
+
+The result is a more mature and modular workflow than the original prototype.
+
+## Future Improvements
+
+Possible next steps include:
+
+- adding `requirements.txt`
+- introducing domain-based routing across multiple legal sectors
+- improving file naming conventions
+- redesigning the critic/validator stage as an error-reporting layer
+- adding a simple user interface with Streamlit or Gradio
+- extending support for alternative LLMs such as GPT-4 or Claude
+
+## Tech Stack
+
+- **Python**
+- **n8n**
+- **Google Gemini**
+- **Pandas**
+- **OpenPyXL**
+- **REST/Webhooks**
+- **JSON / Excel-based ETL**
