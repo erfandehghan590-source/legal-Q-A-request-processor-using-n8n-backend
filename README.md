@@ -1,5 +1,6 @@
-<img width="1921" height="1285" alt="image" src="https://github.com/user-attachments/assets/5f1af879-6b81-4a62-86ac-6d222895fbf6" />
-# Intelligent Legal Data Generation Pipeline
+<img width="1729" height="1156" alt="image" src="https://github.com/user-attachments/assets/5f1af879-6b81-4a62-86ac-6d222895fbf6" />
+
+## Intelligent Legal Data Generation Pipeline
 
 An end-to-end AI pipeline for transforming raw statutory text into structured, multi-level legal question-answer datasets for chatbot, LLM, and RAG evaluation.
 
