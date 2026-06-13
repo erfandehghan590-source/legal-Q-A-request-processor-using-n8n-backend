@@ -81,7 +81,6 @@ This separation improves:
 - ease of prompt iteration without redeploying Python code
 
 ## End-to-End Data Flow
-```text
 Raw Law Files
    ↓
 main_pipeline.py
