@@ -81,21 +81,21 @@ This separation improves:
 - ease of prompt iteration without redeploying Python code
 
 ## End-to-End Data Flow
-Raw Law Files
-   ↓
-main_pipeline.py
-   ↓
-n8n Webhook
-   ↓
-Gemini LLM
-   ↓
-Generated QA Table (TXT)
-   ↓
-Excel Conversion (XLSX)
-   ↓
-Aggregated Excel Output
-   ↓
-Structured JSON Files
+>Raw Law Files
+>   ↓
+>main_pipeline.py
+>   ↓
+>n8n Webhook
+>   ↓
+>Gemini LLM
+>   ↓
+>Generated QA Table (TXT)
+>   ↓
+>Excel Conversion (XLSX)
+>   ↓
+>Aggregated Excel Output
+>   ↓
+>Structured JSON Files
 
 ## Reasoning Levels
 
